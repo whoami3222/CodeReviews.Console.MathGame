@@ -15,9 +15,13 @@ void MathGame()
 void DisplayMenu()
 {
     Console.WriteLine("Choose from the menu below:");
-    Console.WriteLine("1. Start Game");
-    Console.WriteLine("2. Display History");
-    Console.WriteLine("3. Exit");
+    Console.WriteLine("1. Summation");
+    Console.WriteLine("2. Subtraction");
+    Console.WriteLine("3. Multiplication");
+    Console.WriteLine("4. Division");
+    Console.WriteLine("5. Random Operation");
+    Console.WriteLine("6. Display History");
+    Console.WriteLine("7. Exit");
 }
 
 void HandleMenuChoice(string? choice)
@@ -25,12 +29,24 @@ void HandleMenuChoice(string? choice)
     switch (choice)
     {
         case "1":
-            StartGame();
+            StartGame(MathOperation.Addition);
             break;
         case "2":
-            DisplayList();
+            StartGame(MathOperation.Subtraction);
             break;
         case "3":
+            StartGame(MathOperation.Multiplication);
+            break;
+        case "4":
+            StartGame(MathOperation.Division);
+            break;
+        case "5":
+            StartGame(MathOperation.Random);
+            break;
+        case "6":
+            DisplayList();
+            break;
+        case "7":
             Console.WriteLine("Exiting the game. Goodbye!");
             Environment.Exit(0);
             break;
@@ -40,17 +56,32 @@ void HandleMenuChoice(string? choice)
     }
 }
 
-void StartGame()
+void StartGame(MathOperation operation)
 {
     Stopwatch stopwatch = Stopwatch.StartNew();
     
     for (int i = 0; i < 5; i++)
     {
-        int number1 = new Random().Next(1, 9);
-        int number2 = new Random().Next(1, 9);
-        MathOperation operation = (MathOperation)new Random().Next(0, 4);
+        MathOperation questionOperation = operation == MathOperation.Random
+            ? (MathOperation)Random.Shared.Next(0, 4)
+            : operation;
+        int number1;
+        int number2;
 
-        string operationSymbol = operation switch
+        if (questionOperation == MathOperation.Division)
+        {
+            number2 = Random.Shared.Next(1, 11); 
+            int maxQuotient = 100 / number2; 
+            int quotient = Random.Shared.Next(0, maxQuotient + 1); 
+            number1 = number2 * quotient; 
+        }
+        else
+        {
+            number1 = Random.Shared.Next(1, 9);
+            number2 = Random.Shared.Next(1, 9);
+        }
+
+        string operationSymbol = questionOperation switch
         {
             MathOperation.Addition => "+",
             MathOperation.Subtraction => "-",
@@ -61,7 +92,7 @@ void StartGame()
 
         Console.WriteLine($"Question {i + 1}: What is {number1} {operationSymbol} {number2}?");
         string? input = Console.ReadLine();
-        if (CheckAnswer(number1, number2, operation, input))
+        if (CheckAnswer(number1, number2, questionOperation, input))
         {
             points++;
         }
@@ -129,5 +160,6 @@ public enum MathOperation
     Addition,
     Subtraction,
     Multiplication,
-    Division
+    Division,
+    Random
 }
